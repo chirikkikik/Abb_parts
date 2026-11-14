@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Інтерактивна історія від імені роверів на Місяці та Марсі">
+  <title>Самотні сигнали — візуальна новела</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <!-- Екран 1: вибір планети -->
+    <section class="screen screen--home is-active" id="home-screen">
+      <div class="home-copy">
+        <p class="eyebrow">ІНТЕРАКТИВНА ВІЗУАЛЬНА НОВЕЛА</p>
+        <h1>Самотні<br><span>сигнали</span></h1>
+        <p class="intro">Дві далекі місії. Два ровери. Історії, які ще ніхто не почув.</p>
+        <p class="hint">ОБЕРИ, ДЕ ПОЧНЕТЬСЯ ТВОЯ ІСТОРІЯ</p>
+      </div>
+      <div class="world-picker">
+        <button class="world-card world-card--moon" data-world="moon" aria-label="Обрати Місяць">
+          <img src="assets/moon.svg" alt="" class="world-image">
+          <span class="world-name">Місяць</span>
+          <span class="world-subtitle">Тиша на відстані 384 400 км</span>
+          <span class="world-action">Дослідити <span aria-hidden="true">↗</span></span>
+        </button>
+        <button class="world-card world-card--mars" data-world="mars" aria-label="Обрати Марс">
+          <img src="assets/mars.svg" alt="" class="world-image">
+          <span class="world-name">Марс</span>
+          <span class="world-subtitle">Червона пустеля без краю</span>
+          <span class="world-action">Дослідити <span aria-hidden="true">↗</span></span>
+        </button>
+      </div>
+      <div class="home-footer"><span>01 / 03</span><span>ІСТОРІЯ ПОЧИНАЄТЬСЯ З ВИБОРУ</span></div>
+    </section>
+
+    <!-- Екран 2: вибір персонажа -->
+    <section class="screen screen--characters" id="character-screen">
+      <header class="topbar">
+        <button class="back-button" id="back-home">← <span>До вибору світу</span></button>
+        <span class="topbar-mark">SAMOTNI SIGNALY</span>
+      </header>
+      <div class="section-heading">
+        <p class="eyebrow" id="character-eyebrow">МІСЦЕ ПРИЗНАЧЕННЯ</p>
+        <h2>Хто розповість<br><span>цю історію?</span></h2>
+        <p>Обери ровера, щоб почути його спогади.</p>
+      </div>
+      <div class="character-grid" id="character-grid"></div>
+      <div class="home-footer"><span>02 / 03</span><span>ОБЕРИ СВОГО ОПОВІДАЧА</span></div>
+    </section>
+
+    <!-- Екран 3: візуальна новела -->
+    <section class="screen screen--story" id="story-screen">
+      <div class="story-background" id="story-background"></div>
+      <header class="story-topbar">
+        <button class="back-button" id="back-characters">← <span>Змінити ровера</span></button>
+        <span class="chapter-label" id="chapter-label">РОЗДІЛ 01</span>
+        <button class="restart-button" id="restart-story" title="Почати спочатку">↺</button>
+      </header>
+      <div class="story-scene">
+        <div class="scene-meta">
+          <span class="live-dot"></span>
+          <span id="scene-location">МІСЯЦЬ · МОРЕ СПОКОЮ</span>
+        </div>
+        <div class="character-stage">
+          <img id="character-sprite" src="assets/rover-moon.svg" alt="Ровер">
+        </div>
+        <div class="dialogue-panel">
+          <div class="speaker-row">
+            <span class="speaker-name" id="speaker-name">Ровер</span>
+            <span class="speaker-tag">ОСОБИСТИЙ ЖУРНАЛ</span>
+          </div>
+          <p class="dialogue-text" id="dialogue-text" aria-live="polite"></p>
+          <div class="dialogue-bottom">
+            <span class="progress-label" id="progress-label">01 / 05</span>
+            <button class="next-button" id="next-slide">Далі <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="story-footer"><span>ЗАПИСИ З ПОВЕРХНІ</span><span>ЗВ'ЯЗОК НЕ ЗАВЖДИ ОЗНАЧАЄ ВІДПОВІДЬ</span></div>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
