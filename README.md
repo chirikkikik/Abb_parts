@@ -1,18 +1,3 @@
-# Самотні сигнали — шаблон візуальної новели
+**Celestial Guide**
 
-## Як запустити
-1. Розпакуй архів.
-2. Відкрий папку `rover_visual_novel` у VS Code.
-3. Відкрий `index.html` у браузері. Зручніше — через розширення **Live Server**: правий клік на `index.html` → **Open with Live Server**.
-
-## Структура
-- `index.html` — три екрани: вибір світу, вибір персонажа, історія.
-- `styles.css` — оформлення та адаптивність.
-- `script.js` — переходи, персонажі й текстові слайди.
-- `assets/` — SVG-зображення Місяця, Марса та роверів.
-
-## Як змінити історії
-У `script.js` знайди об'єкт `stories`. Кожен елемент масиву — окремий мініслайд. Додавай або редагуй рядки в лапках. Кнопка «Далі» автоматично перемикає слайди.
-
-## Як додати власні зображення
-Заміни SVG-файли в `assets/` або зміни шляхи до них у `worlds` у файлі `script.js`. Для фонових зображень використовуються `assets/moon.svg` і `assets/mars.svg`.
+Built for both young space enthusiasts and complete newcomers, our interactive web experience immerses users in aerospace engineering through first-person storytelling—giving a direct voice to the spacecraft humanity has left across the solar system. Grounded in research on how strongly young audiences learn through empathy, our script balances emotional resonance with rigorous science. Our interface serves two audiences at once: newcomers get pulled in by the emotional, first-person voice of the spacecraft, while curious tech enthusiasts can inspect real engineering details. Stories are powered by verified mission data from NASA and international space agencies, delivered via a fast, lightweight, and universally accessible HTML/CSS web platform so it loads instantly on low-end laptops and PCs, older school computers, and slow internet connections—removing technical barriers so any student or teacher can use it immediately without installing apps.
