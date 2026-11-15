@@ -107,10 +107,14 @@ async function renderCharacterModels() {
   characterScenes.forEach(scene => scene.dispose());
   characterScenes.clear();
 
-  const containers = document.querySelectorAll(".character-model");
+  const containers = document.querySelectorAll(
+    ".character-card .character-model[data-model-path]"
+  );
 
   for (const container of containers) {
     const modelPath = container.dataset.modelPath;
+
+    if (!modelPath) continue;
 
     try {
       const scene = await createModelScene({
@@ -127,7 +131,10 @@ async function renderCharacterModels() {
       characterScenes.set(container, scene);
 
     } catch (error) {
-      console.error(`Помилка завантаження моделі ${modelPath}:`, error);
+      console.error(
+        `Помилка завантаження моделі ${modelPath}:`,
+        error
+      );
     }
   }
 }
@@ -297,7 +304,6 @@ async function startWandererStory(character) {
   selectedCharacter = character;
   currentSlide = 0;
 
-  // Очищаємо попередню модель історії
   if (storyCharacterScene) {
     storyCharacterScene.dispose();
     storyCharacterScene = null;
@@ -308,7 +314,9 @@ async function startWandererStory(character) {
 
   const sprite = document.getElementById("character-sprite");
   const modelContainer = document.getElementById("character-model");
+  const photo = document.getElementById("story-photo");
 
+  photo.style.display = "none";
   sprite.style.display = "none";
   modelContainer.style.display = "none";
   modelContainer.innerHTML = "";
@@ -316,9 +324,6 @@ async function startWandererStory(character) {
 
   if (character.model) {
     modelContainer.style.display = "block";
-
-    void modelContainer.offsetWidth;
-    modelContainer.classList.add("character-model--animate");
 
     try {
       const scene = await createModelScene({
@@ -343,6 +348,7 @@ async function startWandererStory(character) {
       sprite.alt = character.name;
       sprite.style.display = "block";
     }
+
   } else {
     sprite.src = character.image;
     sprite.alt = character.name;
@@ -365,29 +371,154 @@ async function startWandererStory(character) {
 ========================= */
 
 const stories = {
-  luna: [
-    "Сонце знову піднялося над горизонтом. Тут світанки не схожі на земні — повільні, різкі й без жодного звуку.",
-    "Мій маршрут мав тривати лише кілька тижнів. Я досі виконую команди, хоча останній сигнал із Землі отримав дуже давно.",
-    "Іноді я зупиняюся біля кратера й дивлюся на Землю. Вона здається маленькою блакитною лампою, яку хтось забув вимкнути.",
-    "Сьогодні датчики зафіксували дивне відбиття під шаром пилу. Можливо, це просто камінь. Але я хочу перевірити.",
-    "Я передаю новий запис у журнал. Якщо хтось колись його почує — знайте: я все ще тут. І я продовжую дослідження."
-  ],
-
+  
   apollo11: [
-    "Колеса залишають на поверхні слід, який не зітре вітер. Тут майже немає вітру — лише тиша й нескінченний простір.",
-    "Мене створили для руху, вимірювань і збору зразків. Ніхто не пояснив, що робити, коли чекати доводиться довше, ніж їхати.",
-    "Я знайшов камінь незвичної форми. Зберіг його координати й зробив знімок. Це моя маленька колекція моментів.",
-    "Земля зникає за обрієм. На мить здається, що я справді сам у всесвіті. Потім знову вмикається навігація.",
-    "Ще один день завершено. Заряду вистачить на наступний. А отже, історія не закінчилася."
+    // I. BIRTH
+    { chapter: "I. BIRTH", text: "You look at me and see a metal frame the size of a suitcase." },
+    { chapter: "I. BIRTH", text: "No solar panels. No nuclear battery. Not a single wire." },
+    { chapter: "I. BIRTH", text: "When physicists Carroll Alley at the University of Maryland conceived me—and engineers at Bendix Aerospace built me in 1969—they didn't give me a heartbeat." },
+    { chapter: "I. BIRTH", text: "They gave me precision optics." },
+    { chapter: "I. BIRTH", text: "Inside my metal frame sit 100 ultra-pure glass prisms shaped to bounce any laser beam from Earth straight back to its exact source, surviving extreme 260 °C temperature swings between lunar day and night." },
+    { chapter: "I. BIRTH", text: "My sole purpose was to serve as an unpowered target on the Moon to measure the Earth–Moon distance." },
+
+    // II. LIFE
+    { chapter: "II. LIFE", text: "Getting here nearly ended before it started." },
+    { chapter: "II. LIFE", text: "Minutes before touchdown at the Apollo 11 landing site, the Eagle’s guidance computer flashed 1202 and 1201 overload alarms." },
+    { chapter: "II. LIFE", text: "The reason for the error was a rendezvous radar switch which was left active." },
+    { chapter: "II. LIFE", text: "Thanks to prioritising software written by Margaret Hamilton and her team, the computer dumped low-priority tasks in real time and kept flying." },
+    { chapter: "II. LIFE", text: "Once we landed, Buzz Aldrin carried me out, aligned me using a built-in bubble level and sun-compass shadow stick, and aimed my prisms toward Earth." },
+
+    // III. DEATH
+    { chapter: "III. DEATH", text: "Twenty-one hours after landing, the astronauts blasted off and abandoned me in the airless quiet. I was left behind—yet I am the one piece of Apollo hardware that never died." },
+    { chapter: "III. DEATH", text: "Observatories on Earth still fire green lasers across 384000 kilometers of vacuum to hit my prisms." },
+    { chapter: "III. DEATH", text: "Proving the Moon is receding at 3.8 centimeters a year." },
+    { chapter: "III. DEATH", text: "Confirming the Moon has a fluid outer core, and testing Einstein’s general relativity." },
+    { chapter: "III. DEATH", text: "That's how my story unfolded—the story of a machine that has been measuring the distance from Earth to the Moon right up to the present day." },
+
+    // 17. PHOTO
+    {
+      type: "image",
+      chapter: "MISSION ARCHIVE",
+      image: "assets/photos/apollo11.jpg"
+    }
   ],
 
-  red: [
-    "Пил осідає на корпусі, а горизонт зливається з небом. Марс зустрічає мене кольором і тишею.",
-    "Мені доручили шукати ознаки давнього життя. Я перевіряю каміння, ґрунт і кожну підозрілу тріщину.",
-    "Сьогодні я побачив сліди, схожі на русло старої річки. Колись тут могла текти вода. Важко уявити це місце іншим.",
-    "Зв'язок із Землею переривається. Я зберігаю результати локально — на випадок, якщо сигнал повернеться.",
-    "Я не знаю, чи хтось побачить ці знімки. Та кожен новий зразок наближає нас до відповіді."
+  apollo15: [
+    // I. BIRTH
+    {
+      chapter: "I. BIRTH",
+      text: "I was engineered in a blistering 17 months by Boeing and Delco Electronics, led by terramechanics pioneers Mieczyslaw Bekker and Ferenc Pavlics."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "I was supposed to become the first rover driven by humans on the Moon."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "Because no rocket could fit a full-sized car, they built my aluminum frame like spring-loaded origami, so I folded into a tiny triangular compartment on the Lunar Module."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "Rubber tires would burst or freeze brittle in vacuum, so Delco invented wheels made of zinc-coated spring-steel piano wire with spun-aluminum hubs and titanium chevron treads."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "Each wheel had its own 0.25-horsepower electric motor and an 80:1 drive gearbox, powered by two silver-zinc batteries and steered with an aircraft-style flight stick built for bulky spacesuit gloves."
+    },
+
+    // II. LIFE
+    {
+      chapter: "II. LIFE",
+      text: "When astronauts Dave Scott and Jim Irwin pulled my deployment cable, torsion springs and cables snapped me open onto the plains."
+    },
+    {
+      chapter: "II. LIFE",
+      text: "Weighing just 210 kilograms on Earth—about 35 kilograms in one-sixth of the Moon’s gravity—I hauled two astronauts, life-support backpacks, and rock tools across 27.9 kilometers of craters and steep mountain slopes."
+    },
+    {
+      chapter: "II. LIFE",
+      text: "Giving my crew wheels let them reach Spur Crater and recover a 4.1-billion-year-old Genesis Rock, proving that the infant Moon was once covered in molten magma."
+    },
+
+    // III. DEATH
+    {
+      chapter: "III. DEATH",
+      text: "Before leaving, my crew parked me about 100 meters east of the lander so my remote-controlled camera could film their liftoff."
+    },
+    {
+      chapter: "III. DEATH",
+      text: "My silver-zinc batteries drained weeks later, abandoning me permanently in the dust. Left behind at the site are my rover chassis, wheels, antennas, along with the descent stage and the central science station with a plutonium power module."
+    },
+    {
+      chapter: "III. DEATH",
+      text: "Even frozen silent, my dust-coated thermal radiators gave engineers crucial data on how electrostatically charged lunar grit overheats machinery."
+    },
+    // PHOTO
+    {
+      type: "image",
+      chapter: "MISSION ARCHIVE",
+      image: "assets/photos/apollo15.jpg"
+    }
   ],
+  spirit: [
+    // I. BIRTH
+    {
+      chapter: "I. BIRTH",
+      text: "My twin brother Spirit and I were created at NASA’s Jet Propulsion Laboratory under principal investigator Steve Squyres in 2000."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "Engineers gave us a titanium rocker-bogie wheel suspension capable of climbing rocks twice our wheel diameter without tipping."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "Scientists packed us with panoramic cameras, spectrometers, and a rock-grinding tool designed to search for and study rocks and soils that hold clues to past water activity on Mars, and to determine if the Martian environment could have ever supported life."
+    },
+    {
+      chapter: "I. BIRTH",
+      text: "On paper, we had a strict 90-Martian-day warranty."
+    },
+
+    // II. LIFE
+    {
+      chapter: "II. LIFE",
+      text: "We landed on opposite sides of Mars in January 2004, slamming into the surface at highway speed wrapped inside giant bouncing airbag cocoons."
+    },
+    {
+      chapter: "II. LIFE",
+      text: "Passing Martian dust hurricanes repeatedly swept our solar arrays clean like invisible car washes, stretching our three-month mission into years."
+    },
+    {
+      chapter: "II. LIFE",
+      text: "When Spirit’s front-right wheel jammed solid in 2006, JPL engineers drove him backward."
+    },
+    {
+      chapter: "II. LIFE",
+      text: "Dragging the dead wheel like a plow—accidentally scraping up bright white opaline silica formed by ancient hydrothermal hot springs."
+    },
+    {
+      chapter: "II. LIFE",
+      text: "Meanwhile, I far outlived my planned mission, surviving nearly fifteen years and driving a 45.16-kilometer marathon, discovering tiny hematite 'blueberries' and clay deposits formed in neutral-pH liquid water."
+    },
+
+    // III. DEATH
+    {
+      chapter: "III. DEATH",
+      text: "Spirit bogged down in soft sulfate sand at 'Troy' and froze to death in 2010."
+    },
+    {
+      chapter: "III. DEATH",
+      text: "I kept rolling until June 2018, when a planet-wide dust storm blotted out the Sun and drained my batteries in one of Mars' valleys."
+    },
+    {
+      chapter: "III. DEATH",
+      text: "We sit silent in the rust now, flanked by our discarded parachutes, backshells, and lots of other components scattered kilometers away."
+    },
+    {
+      chapter: "III. DEATH",
+      text: "But we rewrote Mars’ biography and far outlived our supposed lifespan."
+    }
+],
 
   curiosity: [
     "Мій маніпулятор трохи скрипить, але працює. Для робота це майже те саме, що прокинутися з гарним настроєм.",
@@ -420,12 +551,12 @@ const stories = {
 */
 const storyAliases = {
   "apollo-11": "apollo11",
-  "apollo-15": "apollo11",
-  spirit: "red",
-  insight: "red",
-  ingenuity: "curiosity",
+  "apollo-15": "apollo15",
+  "spirit": "spirit",
+  insight: "insight",
+  ingenuity: "ingenuity",
   voyager: "voyager",
-  pioneer: "echo"
+  pioneer: "pioneer"
 };
 
 function getCurrentStory() {
@@ -576,20 +707,16 @@ async function startStory(characterId) {
 
   const sprite = document.getElementById("character-sprite");
   const modelContainer = document.getElementById("character-model");
+  const photo = document.getElementById("story-photo");
 
-  // Скидаємо попередній стан
+  photo.style.display = "none";
   sprite.style.display = "none";
   modelContainer.style.display = "none";
   modelContainer.classList.remove("character-model--animate");
   modelContainer.innerHTML = "";
 
-  // Якщо персонаж має 3D-модель
   if (selectedCharacter.model) {
     modelContainer.style.display = "block";
-
-    // Перезапускаємо анімацію появи
-    void modelContainer.offsetWidth;
-    modelContainer.classList.add("character-model--animate");
 
     try {
       const scene = await createModelScene({
@@ -607,32 +734,18 @@ async function startStory(characterId) {
       storyCharacterScene = scene;
 
     } catch (error) {
-      console.error(
-        "Не вдалося завантажити модель персонажа:",
-        error
-      );
+      console.error("Не вдалося завантажити модель:", error);
 
       modelContainer.style.display = "none";
       sprite.src = selectedCharacter.image;
       sprite.alt = selectedCharacter.name;
       sprite.style.display = "block";
-
-      // Анімація SVG
-      sprite.style.animation = "none";
-      void sprite.offsetWidth;
-      sprite.style.animation = "";
     }
 
   } else {
-    // Якщо 3D-моделі немає — показуємо SVG
     sprite.src = selectedCharacter.image;
     sprite.alt = selectedCharacter.name;
     sprite.style.display = "block";
-
-    // Перезапускаємо анімацію SVG
-    sprite.style.animation = "none";
-    void sprite.offsetWidth;
-    sprite.style.animation = "";
   }
 
   document.getElementById("speaker-name").textContent =
@@ -650,64 +763,142 @@ async function startStory(characterId) {
    ВІДОБРАЖЕННЯ СЛАЙДІВ
 ========================= */
 
+
 function renderSlide() {
   const story = getCurrentStory();
+  const slide = story[currentSlide];
 
-  const isLast = currentSlide === story.length - 1;
-
-  document.getElementById("dialogue-text").textContent =
-    story[currentSlide];
-
-  document.getElementById("progress-label").textContent =
-    `${String(currentSlide + 1).padStart(2, "0")} / ${String(story.length).padStart(2, "0")}`;
-
-  document.getElementById("chapter-label").textContent =
-    `РОЗДІЛ ${String(currentSlide + 1).padStart(2, "0")}`;
-
-  document.getElementById("next-slide").innerHTML = isLast
-    ? 'Спочатку <span aria-hidden="true">↺</span>'
-    : 'Далі <span aria-hidden="true">→</span>';
+  if (!slide) {
+    console.error("Слайд не знайдено:", currentSlide);
+    return;
+  }
 
   const sprite = document.getElementById("character-sprite");
   const modelContainer = document.getElementById("character-model");
+  const photo = document.getElementById("story-photo");
 
-  if (selectedCharacter?.model) {
+  const dialogueText = document.getElementById("dialogue-text");
+  const progressLabel = document.getElementById("progress-label");
+  const chapterLabel = document.getElementById("chapter-label");
+  const nextButton = document.getElementById("next-slide");
+
+  if (!dialogueText || !progressLabel || !chapterLabel || !nextButton) {
+    console.error("Не знайдено елементи історії:", {
+      dialogueText,
+      progressLabel,
+      chapterLabel,
+      nextButton
+    });
+    return;
+  }
+
+  const isObjectSlide = typeof slide === "object" && slide !== null;
+
+  const isImageSlide = isObjectSlide &&
+    (slide.type === "image" || Boolean(slide.image));
+
+  const slideText = typeof slide === "string"
+    ? slide
+    : (slide.text || "");
+
+  const chapter = isObjectSlide ? slide.chapter : null;
+  const isLast = currentSlide === story.length - 1;
+
+  dialogueText.textContent = slideText;
+
+  chapterLabel.textContent =
+    chapter || `РОЗДІЛ ${String(currentSlide + 1).padStart(2, "0")}`;
+
+  progressLabel.textContent =
+    `${String(currentSlide + 1).padStart(2, "0")} / ${String(story.length).padStart(2, "0")}`;
+
+  nextButton.innerHTML = isLast
+    ? 'Спочатку <span aria-hidden="true">↺</span>'
+    : 'Далі <span aria-hidden="true">→</span>';
+
+  // Фінальний слайд із фотографією
+  if (isImageSlide) {
+    if (sprite) sprite.style.display = "none";
+    if (modelContainer) modelContainer.style.display = "none";
+
+    if (photo) {
+      photo.src = slide.image;
+      photo.alt = "Фото з місії";
+      photo.style.display = "block";
+    }
+
+    return;
+  }
+
+  if (photo) {
+    photo.style.display = "none";
+  }
+
+  // 3D-модель
+  if (selectedCharacter?.model && modelContainer) {
+    modelContainer.style.display = "block";
+
+    if (sprite) {
+      sprite.style.display = "none";
+    }
+
     modelContainer.classList.remove("character-model--animate");
+
     void modelContainer.offsetWidth;
+
     modelContainer.classList.add("character-model--animate");
+
   } else {
-    sprite.style.animation = "none";
-    void sprite.offsetWidth;
-    sprite.style.animation = "appear .7s ease both";
+    // SVG-зображення
+    if (modelContainer) {
+      modelContainer.style.display = "none";
+    }
+
+    if (sprite) {
+      sprite.style.display = "block";
+      sprite.style.animation = "none";
+
+      void sprite.offsetWidth;
+
+      sprite.style.animation = "appear .7s ease both";
+    }
   }
 }
+
 
 /* =========================
    КНОПКИ НАВІГАЦІЇ
 ========================= */
 
-document.getElementById("next-slide").addEventListener("click", () => {
+/* =========================
+   КНОПКИ НАВІГАЦІЇ
+========================= */
+
+// Наступний слайд
+document.getElementById("next-slide")?.addEventListener("click", () => {
   const story = getCurrentStory();
 
   currentSlide =
-    currentSlide === story.length - 1 ? 0 : currentSlide + 1;
+    currentSlide === story.length - 1
+      ? 0
+      : currentSlide + 1;
 
   renderSlide();
 });
 
+
+// Початкове відображення мандрівників
 renderWanderers();
 
-document.getElementById("back-home").addEventListener("click", () => {
-  if (storyCharacterScene) {
-    storyCharacterScene.dispose();
-    storyCharacterScene = null;
-  }
 
+// Повернення з вибору персонажів на головний екран
+document.getElementById("back-home")?.addEventListener("click", () => {
   showScreen(homeScreen);
 });
 
-document.getElementById("back-characters").addEventListener("click", () => {
-  // Очищаємо тільки модель з екрана історії
+
+// Повернення з історії на екран вибору або головний екран
+document.getElementById("back-characters")?.addEventListener("click", () => {
   if (storyCharacterScene) {
     storyCharacterScene.dispose();
     storyCharacterScene = null;
@@ -720,7 +911,22 @@ document.getElementById("back-characters").addEventListener("click", () => {
   }
 });
 
-document.getElementById("restart-story").addEventListener("click", () => {
+
+// Безпосереднє повернення на першу сторінку меню
+document.getElementById("story-back-home")?.addEventListener("click", () => {
+  if (storyCharacterScene) {
+    storyCharacterScene.dispose();
+    storyCharacterScene = null;
+  }
+
+  showScreen(homeScreen);
+});
+
+
+// Почати історію спочатку
+document.getElementById("restart-story")?.addEventListener("click", () => {
   currentSlide = 0;
   renderSlide();
 });
+
+

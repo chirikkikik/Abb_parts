@@ -960,6 +960,10 @@ h2 {
   width: 80vw;
   height: 34vh;
   }
+  .story-photo {
+  max-width: 90vw;
+  max-height: 35vh;
+  }
 }
 
 .character-stage {
@@ -990,6 +994,8 @@ h2 {
   animation: appear .7s ease both;
 }
 
+
+
 @keyframes rover-emerge {
   from {
     opacity: 0;
@@ -1000,4 +1006,15 @@ h2 {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.story-photo {
+  max-width: min(75vw, 850px);
+  max-height: 50vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, .2);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, .4);
+  animation: appear .7s ease both;
 }
