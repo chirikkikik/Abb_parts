@@ -21,7 +21,8 @@ const worlds = {
         mission: "Apollo 15",
         year: "1971",
         description: "Місячний автомобіль, який допомагав астронавтам досліджувати віддалені ділянки поверхні.",
-        image: "assets/rover-moon-2.svg"
+        image: "assets/rover-moon-2.svg",
+        model: "/assets/models/rovers/apollo15.glb"
       }
     ]
   },
@@ -54,7 +55,8 @@ const worlds = {
         mission: "Mars 2020",
         year: "2020",
         description: "Досліджує геологію Марса та збирає зразки порід для майбутнього повернення на Землю.",
-        image: "assets/rover-mars-2.svg"
+        image: "assets/rover-mars-2.svg",
+        model: "/assets/models/rovers/ingenuity.glb"
       }
     ]
   }
@@ -88,14 +90,22 @@ const wanderers = [
 ========================= */
 
 const characterScenes = new Map();
+let storyCharacterScene = null;
+const wandererScenes = new Map();
 
 function disposeCharacterScenes() {
   characterScenes.forEach(scene => scene.dispose());
   characterScenes.clear();
 }
 
+function disposeWandererScenes() {
+  wandererScenes.forEach(scene => scene.dispose());
+  wandererScenes.clear();
+}
+
 async function renderCharacterModels() {
-  disposeCharacterScenes();
+  characterScenes.forEach(scene => scene.dispose());
+  characterScenes.clear();
 
   const containers = document.querySelectorAll(".character-model");
 
@@ -105,30 +115,19 @@ async function renderCharacterModels() {
     try {
       const scene = await createModelScene({
         container,
-
-        models: [
-          {
-            id: modelPath,
-            title: "Rover",
-            path: modelPath,
-            position: {
-              x: 0,
-              y: 0,
-              z: 0
-            }
-          }
-        ],
-
+        models: [{
+          id: modelPath,
+          title: "Rover",
+          path: modelPath,
+          position: { x: 0, y: 0, z: 0 }
+        }],
         background: 0x17191d
       });
 
       characterScenes.set(container, scene);
 
     } catch (error) {
-      console.error(
-        `Помилка завантаження моделі ${modelPath}:`,
-        error
-      );
+      console.error(`Помилка завантаження моделі ${modelPath}:`, error);
     }
   }
 }
@@ -141,8 +140,7 @@ function renderWanderers() {
   const container = document.getElementById("wanderers");
 
   if (!container) return;
-
-  container.innerHTML = "";
+  if (container.children.length > 0) return;
 
   // Заборонені зони навколо планет
   const forbiddenZones = [
@@ -254,6 +252,9 @@ async function renderWandererModels() {
   const containers = document.querySelectorAll(".wanderer-model");
 
   for (const container of containers) {
+    // Не завантажуємо модель повторно
+    if (container.dataset.loaded === "true") continue;
+
     const modelPath = container.dataset.modelPath;
 
     try {
@@ -276,7 +277,8 @@ async function renderWandererModels() {
         background: 0x000000
       });
 
-      characterScenes.set(container, scene);
+      wandererScenes.set(container, scene);
+      container.dataset.loaded = "true";
 
     } catch (error) {
       console.error(`Не вдалося завантажити ${modelPath}:`, error);
@@ -288,28 +290,75 @@ async function renderWandererModels() {
    ІСТОРІЯ МАНДРІВНИКІВ
 ========================= */
 
-function startWandererStory(character) {
-  storyEntryPoint = "wanderer";
 
+async function startWandererStory(character) {
+  storyEntryPoint = "wanderer";
   selectedWorld = character.world;
   selectedCharacter = character;
   currentSlide = 0;
 
-  // Встановлюємо фон відкритого космосу
+  // Очищаємо попередню модель історії
+  if (storyCharacterScene) {
+    storyCharacterScene.dispose();
+    storyCharacterScene = null;
+  }
+
   document.getElementById("story-screen")
     .classList.add("story-screen--space");
 
-  // Встановлюємо персонажа
-  document.getElementById("character-sprite").src = character.image;
-  document.getElementById("character-sprite").alt = character.name;
+  const sprite = document.getElementById("character-sprite");
+  const modelContainer = document.getElementById("character-model");
 
-  // Інформація про персонажа
-  document.getElementById("speaker-name").textContent = character.name;
-  document.getElementById("scene-location").textContent = "ВІДКРИТИЙ КОСМОС";
+  sprite.style.display = "none";
+  modelContainer.style.display = "none";
+  modelContainer.innerHTML = "";
+  modelContainer.classList.remove("character-model--animate");
+
+  if (character.model) {
+    modelContainer.style.display = "block";
+
+    void modelContainer.offsetWidth;
+    modelContainer.classList.add("character-model--animate");
+
+    try {
+      const scene = await createModelScene({
+        container: modelContainer,
+        models: [{
+          id: character.id,
+          title: character.name,
+          path: character.model,
+          scaleMultiplier: 2.5,
+          position: { x: 0, y: 0, z: 0 }
+        }],
+        background: 0x000000
+      });
+
+      storyCharacterScene = scene;
+
+    } catch (error) {
+      console.error("Не вдалося завантажити модель:", error);
+
+      modelContainer.style.display = "none";
+      sprite.src = character.image;
+      sprite.alt = character.name;
+      sprite.style.display = "block";
+    }
+  } else {
+    sprite.src = character.image;
+    sprite.alt = character.name;
+    sprite.style.display = "block";
+  }
+
+  document.getElementById("speaker-name").textContent =
+    character.name;
+
+  document.getElementById("scene-location").textContent =
+    character.location;
 
   showScreen(storyScreen);
   renderSlide();
 }
+
 
 /* =========================
    ІСТОРІЇ
@@ -503,8 +552,10 @@ function renderCharacters() {
 async function startStory(characterId) {
   storyEntryPoint = "planet";
 
-  // Очищаємо попередні 3D-сцени
-  disposeCharacterScenes();
+  if (storyCharacterScene) {
+    storyCharacterScene.dispose();
+    storyCharacterScene = null;
+  }
 
   document.getElementById("story-screen")
     .classList.remove("story-screen--space");
@@ -553,7 +604,7 @@ async function startStory(characterId) {
         background: 0x000000
       });
 
-      characterScenes.set(modelContainer, scene);
+      storyCharacterScene = scene;
 
     } catch (error) {
       console.error(
@@ -618,10 +669,17 @@ function renderSlide() {
     : 'Далі <span aria-hidden="true">→</span>';
 
   const sprite = document.getElementById("character-sprite");
+  const modelContainer = document.getElementById("character-model");
 
-  sprite.style.animation = "none";
-  void sprite.offsetWidth;
-  sprite.style.animation = "appear .7s ease both";
+  if (selectedCharacter?.model) {
+    modelContainer.classList.remove("character-model--animate");
+    void modelContainer.offsetWidth;
+    modelContainer.classList.add("character-model--animate");
+  } else {
+    sprite.style.animation = "none";
+    void sprite.offsetWidth;
+    sprite.style.animation = "appear .7s ease both";
+  }
 }
 
 /* =========================
@@ -640,16 +698,25 @@ document.getElementById("next-slide").addEventListener("click", () => {
 renderWanderers();
 
 document.getElementById("back-home").addEventListener("click", () => {
-  disposeCharacterScenes();
+  if (storyCharacterScene) {
+    storyCharacterScene.dispose();
+    storyCharacterScene = null;
+  }
+
   showScreen(homeScreen);
 });
 
 document.getElementById("back-characters").addEventListener("click", () => {
+  // Очищаємо тільки модель з екрана історії
+  if (storyCharacterScene) {
+    storyCharacterScene.dispose();
+    storyCharacterScene = null;
+  }
+
   if (storyEntryPoint === "wanderer") {
     showScreen(homeScreen);
   } else {
     showScreen(characterScreen);
-    disposeCharacterScenes();
   }
 });
 
