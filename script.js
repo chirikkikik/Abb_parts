@@ -100,7 +100,7 @@ const worlds = {
       {
         id: "apollo11",
         name: "Apollo 11",
-        mission: "Lunokhod-1",
+        mission: "Apollo 11",
         year: "1970",
         image: "assets/rover-moon.svg",
         model: "/assets/models/rovers/apollo11.glb"
@@ -126,7 +126,7 @@ const worlds = {
         name: "Opportunity",
         mission: "Mars Science Laboratory",
         year: "2011",
-        description: "Досліджує марсіанські породи та шукає свідчення того, що колись на Марсі існувало життя.",
+        description: "",
         image: "assets/rover-mars.svg",
         model: "/assets/models/rovers/spirit.glb"
       },
@@ -135,7 +135,7 @@ const worlds = {
         name: "InSight",
         mission: "Mars 2020",
         year: "2020",
-        description: "Досліджує геологію Марса та збирає зразки порід для майбутнього повернення на Землю.",
+        description: "",
         image: "assets/rover-mars-2.svg",
         model: "/assets/models/rovers/insight.glb"
       },
@@ -144,7 +144,7 @@ const worlds = {
         name: "Ingenuity",
         mission: "Mars 2020",
         year: "2020",
-        description: "Досліджує геологію Марса та збирає зразки порід для майбутнього повернення на Землю.",
+        description: "",
         image: "assets/rover-mars-2.svg",
         model: "/assets/models/rovers/ingenuity.glb"
       }
@@ -157,8 +157,8 @@ const wanderers = [
   {
     id: "voyager",
     name: "Voyager1",
-    role: "Самотній мандрівник",
-    description: "Залишився далеко від своєї експедиції.",
+    role: "",
+    description: "",
     image: "assets/rover-mars.svg",
     model: "/assets/models/rovers/voyager.glb",
     world: "mars",
@@ -167,13 +167,13 @@ const wanderers = [
   {
     id: "pioneer",
     name: "Pioneer10",
-    role: "Дослідник сигналів",
+    role: "",
     position: {
       x: 0,
       y: 1.5,
       z: 0
     },
-    description: "Намагається відновити зв'язок із Землею.",
+    description: "",
     image: "assets/rover-moon-2.svg",
     world: "moon",
     location: "Deep space",
@@ -396,7 +396,7 @@ async function startWandererStory(character) {
       storyCharacterScene = scene;
 
     } catch (error) {
-      console.error("Не вдалося завантажити модель:", error);
+      console.error("Error", error);
 
       modelContainer.style.display = "none";
       sprite.src = character.image;
@@ -439,7 +439,7 @@ const stories = {
     "Left drifting forever in deep space will be my entire 825-kilogram spacecraft and the Golden Record sealed inside an aluminum cover electroplated with ultra-pure uranium-238 as a cosmic clock.",
     "Long after human civilization changes beyond recognition, I will remain humanity’s farthest physical ambassador among the stars.",
     {
-      text: "It`s me",
+      text: "It's me",
       photos: [
         "assets/photos/voyager1.jpg",
         "assets/photos/voyager2.jpg"
@@ -465,7 +465,7 @@ const stories = {
     "Confirming the Moon has a fluid outer core, and testing Einstein’s general relativity.",
     "That's how my story unfolded—the story of a machine that has been measuring the distance from Earth to the Moon right up to the present day.",
     {
-      text: "It`s me",
+      text: "It's me",
       photos: [
         "assets/photos/apollo11_1.jpg",
         "assets/photos/apollo11_2.jpg"
@@ -485,7 +485,7 @@ const stories = {
     "My silver-zinc batteries drained weeks later, abandoning me permanently in the dust. Left behind at the site are my rover chassis, wheels, antennas, along with the descent stage and the central science station with a plutonium power module.",
     "Even frozen silent, my dust-coated thermal radiators gave engineers crucial data on how electrostatically charged lunar grit overheats machinery.",
     {
-      text: "It`s me",
+      text: "It's me",
       photos: [
         "assets/photos/apollo15_1.jpg",
         "assets/photos/apollo15_2.jpg"
@@ -508,7 +508,7 @@ const stories = {
     "We sit silent in the rust now, flanked by our discarded parachutes, backshells, and lots of other components scattered kilometers away.",
     "But we rewrote Mars’ biography and far outlived our supposed lifespan.",
     {
-      text: "It`s me",
+      text: "It's me",
       photos: [
         "assets/photos/spirit1.jpg",
         "assets/photos/spirit2.jpg"
@@ -525,13 +525,13 @@ const stories = {
     "Over four years, I recorded over 1300 marsquakes and meteoroid impacts, giving scientists the first true X-ray of Mars’s interior: a crust, a rocky mantle, and a large liquid iron-alloy core.",
     "Because I had no wheels to shake off dust, it steadily buried my two solar arrays until my power collapsed in December 2022.",
     "Left behind at my landing site are my three-legged lander deck, robotic arm and scoop, the seismometer, domed Wind and Thermal Shield, the HP³, antennas nearby.",
-"I went dark alone, yet my seismic catalog remains the foundation for understanding how rocky planets form and cool.",
+    "I went dark alone, yet my seismic catalog remains the foundation for understanding how rocky planets form and cool.",
     {
-      text: "It`s me",
-      photos: [
-        "assets/photos/insight1.jpg",
-        "assets/photos/insight2.jpg"
-      ]
+    text: "It's me",
+    photos: [
+    "assets/photos/insight1.jpg",
+    "assets/photos/insight2.jpg"
+    ]
     }
   ],
 
@@ -548,7 +548,7 @@ const stories = {
     "Grounded at \"Valinor Hills,\" there are still parts left behind, including my solar panel, avionics core, damaged rotor hubs, snapped carbon-fiber blade splinters resting in the sand…",
     "Abandoned as an aircraft, I still sit upright as a stationary weather station—forever remembered as the Wright Brothers' moment of off-world aviation.",
     {
-      text: "It`s me",
+      text: "It's me",
       photos: [
         "assets/photos/ingenuity1.jpg",
         "assets/photos/ingenuity2.jpg"
@@ -567,7 +567,7 @@ const stories = {
     "NASA caught my last whisper from 12.2 billion kilometers away. Abandoned to the cold dark and coasting silently toward the red star Aldebaran, the hardware left adrift in deep space.",
     "Even in silence, I am never forgotten: I opened the outer solar system to every mission that followed, and my tiny unexplained slowdown—the \"Pioneer Anomaly\"—helped physicists prove how uneven heat radiation from a spacecraft’s own power source gently pushes it through the vacuum.",
     {
-      text: "It`s",
+      text: "It's me",
       photos: [
         "assets/photos/pioneer1.jpg",
         "assets/photos/pioneer2.jpg"
@@ -594,7 +594,7 @@ function getCurrentStory() {
   const storyId = storyAliases[selectedCharacter?.id] || selectedCharacter?.id;
 
   return stories[storyId] || [
-    "Я продовжую дослідження. Мій журнал усе ще записує кожен новий сигнал."
+    "I'm busy right now."
   ];
 }
 
