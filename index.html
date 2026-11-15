@@ -74,6 +74,7 @@
 
     <!-- Екран 2: вибір персонажа -->
 <section class="screen screen--characters" id="character-screen">
+  <div class="planet-horizon-bg" id="character-planet-bg"></div>
   <header class="topbar">
     <button class="back-button" id="back-home">
       ← <span>To the deep space</span>
@@ -98,6 +99,7 @@
     <!-- Екран 3: візуальна новела -->
     <section class="screen screen--story" id="story-screen">
       <div class="story-background" id="story-background"></div>
+      <div class="planet-horizon-bg planet-horizon-bg--story" id="story-planet-bg"></div>
       <header class="story-topbar">
         <button class="back-button" id="back-characters">← <span>Змінити ровера</span></button>
         <span class="chapter-label" id="chapter-label">РОЗДІЛ 01</span>
@@ -118,6 +120,7 @@
             <span class="speaker-tag">ОСОБИСТИЙ ЖУРНАЛ</span>
           </div>
           <p class="dialogue-text" id="dialogue-text" aria-live="polite"></p>
+          <div class="story-gallery" id="story-gallery"></div>
           <div class="dialogue-bottom">
             <span class="progress-label" id="progress-label">01 / 05</span>
             <button class="next-button" id="next-slide">Далі <span aria-hidden="true">→</span></button>
@@ -126,6 +129,11 @@
       </div>
       <div class="story-footer"><span>ЗАПИСИ З ПОВЕРХНІ</span><span>ЗВ'ЯЗОК НЕ ЗАВЖДИ ОЗНАЧАЄ ВІДПОВІДЬ</span></div>
     </section>
+  <!-- Повноекранний перегляд фото -->
+    <div class="photo-lightbox" id="photo-lightbox" aria-hidden="true">
+      <button class="photo-lightbox__close" id="photo-lightbox-close" aria-label="Закрити фото">✕</button>
+      <img class="photo-lightbox__img" id="photo-lightbox-img" src="" alt="">
+    </div>
   </main>
   <script type="module" src="/script.js"></script>
 </body>

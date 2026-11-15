@@ -16,11 +16,14 @@ async function renderWorldModels() {
       const scene = await createModelScene({
         container,
 
+        autoRotateSpeed: 0.001,
+
         models: [
           {
             id: modelPath,
             title: "Planet",
             path: modelPath,
+            rotation: Math.PI,
 
             position: {
               x: 0,
@@ -47,6 +50,47 @@ async function renderWorldModels() {
   }
 }
 
+let characterPlanetScene = null;
+let storyPlanetScene = null;
+
+async function renderHorizonPlanet(containerId, worldKey, existingScene) {
+  if (existingScene) {
+    existingScene.dispose();
+  }
+
+  const container = document.getElementById(containerId);
+  if (!container) return null;
+
+  container.innerHTML = "";
+
+  const modelPath =
+    worldKey === "mars"
+      ? "/assets/models/planets/mars.glb"
+      : "/assets/models/planets/moon.glb";
+
+  try {
+    return await createModelScene({
+      container,
+      autoRotateSpeed: 0,
+      staticRender: true,
+      models: [
+        {
+          id: `${containerId}-${worldKey}`,
+          title: worldKey,
+          path: modelPath,
+          rotation: 0,
+          cameraFill: 0.65,
+          position: { x: 0, y: 0, z: 0 }
+        }
+      ],
+      background: 0x000000
+    });
+  } catch (error) {
+    console.error(`Не вдалося завантажити 3D-фон планети ${modelPath}:`, error);
+    return null;
+  }
+}
+
 
 const worlds = {
   moon: {
@@ -55,7 +99,7 @@ const worlds = {
     background: "assets/moon.svg",
     characters: [
       {
-        id: "apollo-11",
+        id: "apollo11",
         name: "Apollo 11",
         mission: "Lunokhod-1",
         year: "1970",
@@ -64,7 +108,7 @@ const worlds = {
         model: "/assets/models/rovers/apollo11.glb"
       },
       {
-        id: "apollo-15",
+        id: "apollo15",
         name: "Apollo 15",
         mission: "Apollo 15",
         year: "1971",
@@ -127,6 +171,11 @@ const wanderers = [
     id: "pioneer",
     name: "Pioneer",
     role: "Дослідник сигналів",
+    position: {
+      x: 0,
+      y: 1.5,
+      z: 0
+    },
     description: "Намагається відновити зв'язок із Землею.",
     image: "assets/rover-moon-2.svg",
     world: "moon",
@@ -169,6 +218,7 @@ async function renderCharacterModels() {
           id: modelPath,
           title: "Rover",
           path: modelPath,
+          cameraFill: 0.92,
           position: { x: 0, y: 0, z: 0 }
         }],
         background: 0x17191d
@@ -186,94 +236,41 @@ async function renderCharacterModels() {
    МАНДРІВНИКИ
 ========================= */
 
+
 function renderWanderers() {
   const container = document.getElementById("wanderers");
 
   if (!container) return;
-  if (container.children.length > 0) return;
 
-  // Заборонені зони навколо планет
-  const forbiddenZones = [
-    {
-      left: 20,
-      right: 48,
-      top: 25,
-      bottom: 85
+  container.innerHTML = "";
+
+  // Фіксовані безпечні позиції
+  const positions = {
+    voyager: {
+      left: "7%",
+      top: "60%"
     },
-    {
-      left: 52,
-      right: 80,
-      top: 25,
-      bottom: 85
+    pioneer: {
+      left: "86%",
+      top: "60%"
     }
-  ];
-
-  // Мінімальна відстань між роверами у відсотках
-  const minDistance = 30;
-
-  // Тут зберігаємо координати вже розміщених роверів
-  const placedPositions = [];
-
-  function getRandomPosition() {
-    let attempts = 0;
-
-    while (attempts < 500) {
-      const left = 3 + Math.random() * 90;
-      const top = 10 + Math.random() * 75;
-
-      attempts++;
-
-      // Перевіряємо, чи не потрапив ровер на планету
-      const insidePlanetZone = forbiddenZones.some(zone =>
-        left >= zone.left &&
-        left <= zone.right &&
-        top >= zone.top &&
-        top <= zone.bottom
-      );
-
-      if (insidePlanetZone) continue;
-
-      // Перевіряємо відстань до інших роверів
-      const tooClose = placedPositions.some(position => {
-        const dx = left - position.left;
-        const dy = top - position.top;
-
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        return distance < minDistance;
-      });
-
-      if (tooClose) continue;
-
-      // Якщо всі перевірки пройдені — зберігаємо позицію
-      const newPosition = { left, top };
-
-      placedPositions.push(newPosition);
-
-      return newPosition;
-    }
-
-    // Якщо вільного місця не знайшлося
-    console.warn("Не вдалося знайти вільне місце для ровера");
-
-    return null;
-  }
+  };
 
   wanderers.forEach((character, index) => {
-    const position = getRandomPosition();
+    const position = positions[character.id];
 
-    // Не створюємо персонажа, якщо місця немає
     if (!position) return;
 
     const button = document.createElement("button");
 
     button.className = "wanderer";
+
     if (character.model) {
       button.classList.add("wanderer--3d");
     }
 
-    button.style.left = `${position.left}%`;
-    button.style.top = `${position.top}%`;
+    button.style.left = position.left;
+    button.style.top = position.top;
 
     button.style.animationDelay = `${index * 0.7}s`;
 
@@ -286,6 +283,7 @@ function renderWanderers() {
             ></div>`
           : `<img src="${character.image}" alt="${character.name}">`
       }
+
       <span class="wanderer-name">${character.name}</span>
     `;
 
@@ -295,46 +293,61 @@ function renderWanderers() {
 
     container.appendChild(button);
   });
+
   renderWandererModels();
 }
+
 
 async function renderWandererModels() {
   const containers = document.querySelectorAll(".wanderer-model");
 
   for (const container of containers) {
-    // Не завантажуємо модель повторно
-    if (container.dataset.loaded === "true") continue;
-
     const modelPath = container.dataset.modelPath;
+
+    // Знаходимо відповідного персонажа
+    const character = wanderers.find(
+      item => item.model === modelPath
+    );
+
+    if (!character) continue;
 
     try {
       const scene = await createModelScene({
         container,
+
         models: [
           {
-            id: modelPath,
-            title: "Pioneer",
+            id: character.id,
+            title: character.name,
             path: modelPath,
-            scaleMultiplier: 8,
-            cameraFill: 0.85,
-            position: {
+
+            // Індивідуальний розмір
+            scaleMultiplier: 16,
+            cameraFill: 1.5,
+
+            // Індивідуальна висота
+            position: character.position ?? {
               x: 0,
               y: 0,
               z: 0
             }
           }
         ],
+
         background: 0x000000
       });
 
-      wandererScenes.set(container, scene);
-      container.dataset.loaded = "true";
+      characterScenes.set(container, scene);
 
     } catch (error) {
-      console.error(`Не вдалося завантажити ${modelPath}:`, error);
+      console.error(
+        `Не вдалося завантажити ${modelPath}:`,
+        error
+      );
     }
   }
 }
+
 
 /* =========================
    ІСТОРІЯ МАНДРІВНИКІВ
@@ -415,52 +428,154 @@ async function startWandererStory(character) {
 ========================= */
 
 const stories = {
-  luna: [
-    "Сонце знову піднялося над горизонтом. Тут світанки не схожі на земні — повільні, різкі й без жодного звуку.",
-    "Мій маршрут мав тривати лише кілька тижнів. Я досі виконую команди, хоча останній сигнал із Землі отримав дуже давно.",
-    "Іноді я зупиняюся біля кратера й дивлюся на Землю. Вона здається маленькою блакитною лампою, яку хтось забув вимкнути.",
-    "Сьогодні датчики зафіксували дивне відбиття під шаром пилу. Можливо, це просто камінь. Але я хочу перевірити.",
-    "Я передаю новий запис у журнал. Якщо хтось колись його почує — знайте: я все ще тут. І я продовжую дослідження."
+  voyager: [
+    "I was engineered at NASA's Jet Propulsion Laboratory in the mid-1970s under chief scientist Edward Stone to ride a once-in-175-years alignment of the outer planets.",
+    "Because sunlight at Jupiter and Saturn is too weak for solar panels, General Electric built me three Radioisotope Thermoelectric Generators that convert heat from decaying plutonium-238 oxide into electricity.",
+    "My brain runs on three specific computer subsystems with just 69 kilobytes of total memory—less than a modern car key fob.",
+    "A fiberglass magnetometer rod keeps sensitive sensors away from my own electronics.",
+    "Bolted to my side is the Golden Record, curated by Carl Sagan’s team at Cornell University.",
+    "Launched in 1977, I used Jupiter and Saturn’s gravity like colossal slingshots—discovering active sulfur volcanoes on Io, revealing Titan’s dense nitrogen atmosphere.",
+    "In August 2012, I broke through the heliopause—the magnetic bubble blown by the Sun—and entered interstellar space.",
+    "Keeping me alive over 25 billion kilometers away has required legendary remote rescues.",
+    "NASA fired backup trajectory thrusters after 37 years of dormancy and rewrote corrupted Flight Data memory across a 24-hour light-time delay in 2024.",
+    "I am still transmitting on roughly 220 watts of fading plutonium power, though Jet Propulsion Laboratory engineers will shut down my remaining instruments one by one over the coming years until my radio goes quiet.",
+    "Left drifting forever in deep space will be my entire 825-kilogram spacecraft and the Golden Record sealed inside an aluminum cover electroplated with ultra-pure uranium-238 as a cosmic clock.",
+    "Long after human civilization changes beyond recognition, I will remain humanity’s farthest physical ambassador among the stars.",
+    {
+      text: "It`s me",
+      photos: [
+        "assets/photos/voyager1.jpg",
+        "assets/photos/voyager2.jpg"
+      ]
+    }
   ],
 
   apollo11: [
-    "Колеса залишають на поверхні слід, який не зітре вітер. Тут майже немає вітру — лише тиша й нескінченний простір.",
-    "Мене створили для руху, вимірювань і збору зразків. Ніхто не пояснив, що робити, коли чекати доводиться довше, ніж їхати.",
-    "Я знайшов камінь незвичної форми. Зберіг його координати й зробив знімок. Це моя маленька колекція моментів.",
-    "Земля зникає за обрієм. На мить здається, що я справді сам у всесвіті. Потім знову вмикається навігація.",
-    "Ще один день завершено. Заряду вистачить на наступний. А отже, історія не закінчилася."
+    "You look at me and see a metal frame the size of a suitcase.",
+    "No solar panels. No nuclear battery. Not a single wire.",
+    "When physicists Carroll Alley at the University of Maryland conceived me—and engineers at Bendix Aerospace built me in 1969—they didn't give me a heartbeat.",
+    "They gave me precision optics.",
+    "Inside my metal frame sit 100 ultra-pure glass prisms shaped to bounce any laser beam from Earth straight back to its exact source, surviving extreme 260 °C temperature swings between lunar day and night.",
+    "My sole purpose was to serve as an unpowered target on the Moon to measure the Earth–Moon distance.",
+    "Getting here nearly ended before it started.",
+    "Minutes before touchdown at the Apollo 11 landing site, the Eagle’s guidance computer flashed 1202 and 1201 overload alarms.",
+    "The reason for the error was a rendezvous radar switch which was left active.",
+    "Thanks to prioritising software written by Margaret Hamilton and her team, the computer dumped low-priority tasks in real time and kept flying.",
+    "Once we landed, Buzz Aldrin carried me out, aligned me using a built-in bubble level and sun-compass shadow stick, and aimed my prisms toward Earth.",
+    "Twenty-one hours after landing, the astronauts blasted off and abandoned me in the airless quiet. I was left behind—yet I am the one piece of Apollo hardware that never died.",
+    "Observatories on Earth still fire green lasers across 384000 kilometers of vacuum to hit my prisms.",
+    "Proving the Moon is receding at 3.8 centimeters a year.",
+    "Confirming the Moon has a fluid outer core, and testing Einstein’s general relativity.",
+    "That's how my story unfolded—the story of a machine that has been measuring the distance from Earth to the Moon right up to the present day.",
+    {
+      text: "It`s me",
+      photos: [
+        "assets/photos/apollo11_1.jpg",
+        "assets/photos/apollo11_2.jpg"
+      ]
+    }
+  ],
+  apollo15: [
+    "I was engineered in a blistering 17 months by Boeing and Delco Electronics, led by terramechanics pioneers Mieczyslaw Bekker and Ferenc Pavlics.",
+    "I was supposed to become the first rover driven by humans on the Moon.",
+    "Because no rocket could fit a full-sized car, they built my aluminum frame like spring-loaded origami, so I folded into a tiny triangular compartment on the Lunar Module.",
+    "Rubber tires would burst or freeze brittle in vacuum, so Delco invented wheels made of zinc-coated spring-steel piano wire with spun-aluminum hubs and titanium chevron treads.",
+    "Each wheel had its own 0.25-horsepower electric motor and an 80:1 drive gearbox, powered by two silver-zinc batteries and steered with an aircraft-style flight stick built for bulky spacesuit gloves.",
+    "When astronauts Dave Scott and Jim Irwin pulled my deployment cable, torsion springs and cables snapped me open onto the plains.",
+    "Weighing just 210 kilograms on Earth—about 35 kilograms in one-sixth of the Moon’s gravity—I hauled two astronauts, life-support backpacks, and rock tools across 27.9 kilometers of craters and steep mountain slopes.",
+    "Giving my crew wheels let them reach Spur Crater and recover a 4.1-billion-year-old Genesis Rock, proving that the infant Moon was once covered in molten magma.",
+    "Before leaving, my crew parked me about 100 meters east of the lander so my remote-controlled camera could film their liftoff.",
+    "My silver-zinc batteries drained weeks later, abandoning me permanently in the dust. Left behind at the site are my rover chassis, wheels, antennas, along with the descent stage and the central science station with a plutonium power module.",
+    "Even frozen silent, my dust-coated thermal radiators gave engineers crucial data on how electrostatically charged lunar grit overheats machinery.",
+    {
+      text: "It`s me",
+      photos: [
+        "assets/photos/apollo15_1.jpg",
+        "assets/photos/apollo15_2.jpg"
+      ]
+    }
   ],
 
-  red: [
-    "Пил осідає на корпусі, а горизонт зливається з небом. Марс зустрічає мене кольором і тишею.",
-    "Мені доручили шукати ознаки давнього життя. Я перевіряю каміння, ґрунт і кожну підозрілу тріщину.",
-    "Сьогодні я побачив сліди, схожі на русло старої річки. Колись тут могла текти вода. Важко уявити це місце іншим.",
-    "Зв'язок із Землею переривається. Я зберігаю результати локально — на випадок, якщо сигнал повернеться.",
-    "Я не знаю, чи хтось побачить ці знімки. Та кожен новий зразок наближає нас до відповіді."
+  spirit: [
+    "My twin brother Spirit and I were created at NASA’s Jet Propulsion Laboratory under principal investigator Steve Squyres in 2000.",
+    "Engineers gave us a titanium rocker-bogie wheel suspension capable of climbing rocks twice our wheel diameter without tipping.",
+    "Scientists packed us with panoramic cameras, spectrometers, and a rock-grinding tool designed to search for and study rocks and soils that hold clues to past water activity on Mars, and to determine if the Martian environment could have ever supported life.",
+    "On paper, we had a strict 90-Martian-day warranty.",
+    "We landed on opposite sides of Mars in January 2004, slamming into the surface at highway speed wrapped inside giant bouncing airbag cocoons.",
+    "Passing Martian dust hurricanes repeatedly swept our solar arrays clean like invisible car washes, stretching our three-month mission into years.",
+    "When Spirit’s front-right wheel jammed solid in 2006, JPL engineers drove him backward.",
+    "Dragging the dead wheel like a plow—accidentally scraping up bright white opaline silica formed by ancient hydrothermal hot springs.",
+    "Meanwhile, I far outlived my planned mission, surviving nearly fifteen years and driving a 45-kilometer marathon, discovering tiny hematite \"blueberries\" and clay deposits formed in neutral-pH liquid water.",
+    "Spirit bogged down in soft sulfate sand at \"Troy\" and froze to death in 2010.",
+    "I kept rolling until June 2018, when a planet-wide dust storm blotted out the Sun and drained my batteries in one of Mars' valleys.",
+    "We sit silent in the rust now, flanked by our discarded parachutes, backshells, and lots of other components scattered kilometers away.",
+    "But we rewrote Mars’ biography and far outlived our supposed lifespan.",
+    {
+      text: "It`s me",
+      photos: [
+        "assets/photos/spirit1.jpg",
+        "assets/photos/spirit2.jpg"
+      ]
+    }
   ],
 
-  curiosity: [
-    "Мій маніпулятор трохи скрипить, але працює. Для робота це майже те саме, що прокинутися з гарним настроєм.",
-    "Десь далеко залишилися люди, які зібрали мене по гвинтику. Цікаво, чи дивляться вони зараз на Марс.",
-    "Я підняв камеру й зробив панораму. Пейзаж суворий, але в ньому є дивна краса.",
-    "Система повідомляє про зниження заряду. Я вимикаю другорядні модулі й залишаю активним журнал.",
-    "Якщо це мій останній запис, нехай він буде про цікавість. Саме вона привела мене сюди."
+  insight: [
+    "I was built by Lockheed Martin Space and managed by NASA Jet Propulsion Laboratory to listen for \"marsquakes\" to study Mars's interior.",
+    "My centerpiece instrument was engineered by France’s CNES and IPGP, housing three vacuum-sealed spring pendulums built in the UK, Switzerland, and Germany so sensitive they could detect ground vibrations smaller than the width of a hydrogen atom.",
+    "Alongside it, the German Aerospace Center and Poland’s Astronika built HP³, a self-hammering tungsten thermal probe designed to burrow five meters underground.",
+    "After landing on one of Mars’ volcanic plains, I used my 2.4-meter robotic arm to set it directly onto the Martian dirt and cover it with a Wind and Thermal Shield fringed with a chainmail skirt so wind wouldn't spoil the seismic data.",
+    "When clumpy soil denied HP³ the friction needed to dig, engineers spent months inventing an innovative solution. They commanded my robotic arm to press its scoop sideways against the soil to pin the probe down.",
+    "Over four years, I recorded over 1300 marsquakes and meteoroid impacts, giving scientists the first true X-ray of Mars’s interior: a crust, a rocky mantle, and a large liquid iron-alloy core.",
+    "Because I had no wheels to shake off dust, it steadily buried my two solar arrays until my power collapsed in December 2022.",
+    "Left behind at my landing site are my three-legged lander deck, robotic arm and scoop, the seismometer, domed Wind and Thermal Shield, the HP³, antennas nearby.",
+"I went dark alone, yet my seismic catalog remains the foundation for understanding how rocky planets form and cool.",
+    {
+      text: "Ось мої фото зараз",
+      photos: [
+        "assets/photos/insight1.jpg",
+        "assets/photos/insight2.jpg"
+      ]
+    }
   ],
 
-  voyager: [
-    "Я більше не бачу інших роверів. Лише темний горизонт і слабке світло Землі.",
-    "Мою експедицію завершили, але ніхто не надіслав команду вимкнення.",
-    "Я продовжую рух. Можливо, десь попереду є хтось, хто ще чекає на мене.",
-    "Сьогодні я отримав дивний сигнал. Він дуже схожий на людський голос.",
-    "Я вирушаю назустріч сигналу. Можливо, я нарешті не сам."
+  ingenuity: [
+    "I was born in 2020, and every standard aerodynamics textbook said I couldn't fly.",
+    "Mars’ atmosphere has only 1% of Earth’s surface density—like trying to fly a helicopter 30000 meters up in Earth’s stratosphere.",
+    "To become the first helicopter to fly on another planet, which was my primary purpose, a skunkworks team at NASA Jet Propulsion Laboratory partnered with AeroVironment and Qualcomm to build a coaxial drone.",
+    "They gave me carbon-fiber blades, a solar panel charging six lithium-ion cells, and a processor, running visual-odometry navigation so I could balance myself autonomously across a 10+ minute radio delay.",
+    "I rode to Jezero Crater tucked underneath the Perseverance rover in 2021, dropped onto the dirt, survived 90° C nights with internal resistive heaters.",
+    "Then lifted off on April 19, 2021. Designed for just five test flights, I kept flying—even surviving a dead inclinometer sensor mid-mission thanks to a remote software patch from JPL that tricked my flight computer into faking the missing data.",
+    "I completed 72 flights totaling 17 kilometers, scouting cliffs and boulders ahead of Perseverance.",
+    "My luck ran out on Flight 72 in January 2024.",
+    "Hovering over featureless sand dunes with no rocks for my downward camera to track, I drifted on touchdown and snapped the tips off my carbon-fiber rotor blades.",
+    "Grounded at \"Valinor Hills,\" there are still parts left behind, including my solar panel, avionics core, damaged rotor hubs, snapped carbon-fiber blade splinters resting in the sand…",
+    "Abandoned as an aircraft, I still sit upright as a stationary weather station—forever remembered as the Wright Brothers' moment of off-world aviation.",
+    {
+      text: "Ось мої фото зараз",
+      photos: [
+        "assets/photos/ingenuity1.jpg",
+        "assets/photos/ingenuity2.jpg"
+      ]
+    }
   ],
 
-  echo: [
-    "Мій передавач працює, але відповіді немає.",
-    "Щодня я надсилаю повідомлення на Землю. Щодня отримую тільки тишу.",
-    "Сьогодні я почув відлуння власного сигналу.",
-    "Хтось або щось повторює мої повідомлення.",
-    "Я продовжуватиму слухати. Можливо, одного дня мені відповідять."
+  pioneer: [
+    "Before Voyager could sprint past the giant planets, someone had to kick the door open.",
+    "Managed by NASA Ames Research Center under project manager Charles Hall, in the 1970s I was engineered as a spin-stabilized trailblazer, so my antenna stayed locked onto Earth without burning heavy thruster fuel.",
+    "Powered by four radioisotope thermoelectric generators and armored with radiation-hardened transistors, I carried an Imaging Photopolarimeter, meteoroid penetration cells, and the Pioneer Plaque.",
+    "Launched in 1972 atop an Atlas-Centaur rocket, I left Earth faster than any human object before me.",
+    "Scientists genuinely feared the asteroid belt was an impassable wall of boulders and that Jupiter’s radiation belts would instantly fry my circuits.",
+    "I proved the asteroid belt was mostly empty space and became the first spacecraft to visit Jupiter, surviving lethal radiation doses to snap the first close-up portraits of the Great Red Spot.",
+    "But that scientific breakthrough led to the inevitable: Jupiter’s gravity flung me out of the solar system.",
+    "NASA caught my last whisper from 12.2 billion kilometers away. Abandoned to the cold dark and coasting silently toward the red star Aldebaran, the hardware left adrift in deep space.",
+    "Even in silence, I am never forgotten: I opened the outer solar system to every mission that followed, and my tiny unexplained slowdown—the \"Pioneer Anomaly\"—helped physicists prove how uneven heat radiation from a spacecraft’s own power source gently pushes it through the vacuum.",
+    {
+      text: "Ось мої фото зараз",
+      photos: [
+        "assets/photos/pioneer1.jpg",
+        "assets/photos/pioneer2.jpg"
+      ]
+    }
   ]
 };
 
@@ -469,13 +584,13 @@ const stories = {
   Це потрібно, бо ID у worlds не всюди збігаються з ключами stories.
 */
 const storyAliases = {
-  "apollo-11": "apollo11",
-  "apollo-15": "apollo11",
-  spirit: "red",
-  insight: "red",
-  ingenuity: "curiosity",
+  apollo11: "apollo11",
+  apollo15: "apollo15",
+  spirit: "spirit",
+  insight: "insight",
+  ingenuity: "ingenuity",
   voyager: "voyager",
-  pioneer: "echo"
+  pioneer: "pioneer"
 };
 
 function getCurrentStory() {
@@ -530,7 +645,7 @@ renderWorldModels();
    ВІДОБРАЖЕННЯ ПЕРСОНАЖІВ
 ========================= */
 
-function renderCharacters() {
+async function renderCharacters() {
   const world = worlds[selectedWorld];
 
   const screen = document.getElementById("character-screen");
@@ -538,6 +653,12 @@ function renderCharacters() {
   // Встановлюємо відповідний пейзаж
   screen.classList.remove("planet-moon", "planet-mars");
   screen.classList.add(`planet-${selectedWorld}`);
+
+  characterPlanetScene = await renderHorizonPlanet(
+    "character-planet-bg",
+    selectedWorld,
+    characterPlanetScene
+  );
 
   document.getElementById("character-eyebrow").textContent =
     `МІСЦЕ ПРИЗНАЧЕННЯ · ${world.title.toUpperCase()}`;
@@ -623,8 +744,13 @@ async function startStory(characterId) {
 
   currentSlide = 0;
 
-  document.getElementById("story-background").style.backgroundImage =
-    `url("${worlds[selectedWorld].background}")`;
+  document.getElementById("story-background").style.backgroundImage = "none";
+
+  storyPlanetScene = await renderHorizonPlanet(
+    "story-planet-bg",
+    selectedWorld,
+    storyPlanetScene
+  );
 
   const sprite = document.getElementById("character-sprite");
   const modelContainer = document.getElementById("character-model");
@@ -704,11 +830,33 @@ async function startStory(characterId) {
 
 function renderSlide() {
   const story = getCurrentStory();
-
+  const slide = story[currentSlide];
   const isLast = currentSlide === story.length - 1;
 
-  document.getElementById("dialogue-text").textContent =
-    story[currentSlide];
+  const slideText = typeof slide === "string" ? slide : slide.text;
+  const slidePhotos = typeof slide === "object" && Array.isArray(slide.photos)
+    ? slide.photos
+    : [];
+
+  document.getElementById("dialogue-text").textContent = slideText;
+
+  const gallery = document.getElementById("story-gallery");
+  const dialoguePanel = document.querySelector(".dialogue-panel");
+
+  if (slidePhotos.length > 0) {
+    gallery.innerHTML = slidePhotos
+      .map(
+        (src, index) =>
+          `<img src="${src}" alt="${selectedCharacter?.name ?? "Ровер"} — фото ${index + 1}">`
+      )
+      .join("");
+    gallery.classList.add("is-visible");
+    dialoguePanel.classList.add("has-gallery");
+  } else {
+    gallery.innerHTML = "";
+    gallery.classList.remove("is-visible");
+    dialoguePanel.classList.remove("has-gallery");
+  }
 
   document.getElementById("progress-label").textContent =
     `${String(currentSlide + 1).padStart(2, "0")} / ${String(story.length).padStart(2, "0")}`;
@@ -754,6 +902,14 @@ document.getElementById("back-home").addEventListener("click", () => {
     storyCharacterScene.dispose();
     storyCharacterScene = null;
   }
+  if (characterPlanetScene) {
+    characterPlanetScene.dispose();
+    characterPlanetScene = null;
+  }
+  if (storyPlanetScene) {
+    storyPlanetScene.dispose();
+    storyPlanetScene = null;
+  }
 
   showScreen(homeScreen);
 });
@@ -775,4 +931,45 @@ document.getElementById("back-characters").addEventListener("click", () => {
 document.getElementById("restart-story").addEventListener("click", () => {
   currentSlide = 0;
   renderSlide();
+});
+
+/* =========================
+   ПЕРЕГЛЯД ФОТО НА ВЕСЬ ЕКРАН
+========================= */
+
+const photoLightbox = document.getElementById("photo-lightbox");
+const photoLightboxImg = document.getElementById("photo-lightbox-img");
+const photoLightboxClose = document.getElementById("photo-lightbox-close");
+
+function openPhotoLightbox(src, alt) {
+  photoLightboxImg.src = src;
+  photoLightboxImg.alt = alt;
+  photoLightbox.classList.add("is-open");
+  photoLightbox.setAttribute("aria-hidden", "false");
+}
+
+function closePhotoLightbox() {
+  photoLightbox.classList.remove("is-open");
+  photoLightbox.setAttribute("aria-hidden", "true");
+  photoLightboxImg.src = "";
+}
+
+document.getElementById("story-gallery").addEventListener("click", (event) => {
+  const img = event.target.closest("img");
+  if (!img) return;
+  openPhotoLightbox(img.src, img.alt);
+});
+
+photoLightboxClose.addEventListener("click", closePhotoLightbox);
+
+photoLightbox.addEventListener("click", (event) => {
+  if (event.target === photoLightbox) {
+    closePhotoLightbox();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && photoLightbox.classList.contains("is-open")) {
+    closePhotoLightbox();
+  }
 });

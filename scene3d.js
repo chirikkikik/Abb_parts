@@ -6,6 +6,8 @@ export async function createModelScene({
   container,
   models,
   background = 0x080d18,
+  staticRender = false,
+  autoRotateSpeed = 0,
   onHover = () => {},
   onClick = () => {},
 }) {
@@ -206,23 +208,27 @@ function fitCameraToModel(model, fill = 0.75) {
   renderer.domElement.addEventListener("pointermove", handlePointerMove);
   renderer.domElement.addEventListener("click", handleClick);
 
-  function resize() {
+function resize() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
     if (!width || !height) return;
 
     camera.aspect = width / height;
-  camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 
     if (loadedModels.length > 0) {
-        fitCameraToModel(
+      fitCameraToModel(
         loadedModels[0],
         models[0].cameraFill ?? 0.75
       );
     }
 
-  renderer.setSize(width, height);
+    renderer.setSize(width, height);
+
+    if (staticRender) {
+      renderer.render(scene, camera);
+    }
   }
 
   const resizeObserver = new ResizeObserver(resize);
@@ -231,7 +237,19 @@ function fitCameraToModel(model, fill = 0.75) {
   let animationId;
 
   function animate() {
+    if (staticRender) {
+      renderer.render(scene, camera);
+      return;
+    }
+
     animationId = requestAnimationFrame(animate);
+
+    if (autoRotateSpeed !== 0) {
+      loadedModels.forEach((model) => {
+        model.rotation.y += autoRotateSpeed;
+      });
+    }
+
     renderer.render(scene, camera);
   }
 
