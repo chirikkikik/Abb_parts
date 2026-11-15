@@ -527,7 +527,7 @@ const stories = {
     "Left behind at my landing site are my three-legged lander deck, robotic arm and scoop, the seismometer, domed Wind and Thermal Shield, the HP³, antennas nearby.",
 "I went dark alone, yet my seismic catalog remains the foundation for understanding how rocky planets form and cool.",
     {
-      text: "Ось мої фото зараз",
+      text: "It`s me",
       photos: [
         "assets/photos/insight1.jpg",
         "assets/photos/insight2.jpg"
@@ -548,7 +548,7 @@ const stories = {
     "Grounded at \"Valinor Hills,\" there are still parts left behind, including my solar panel, avionics core, damaged rotor hubs, snapped carbon-fiber blade splinters resting in the sand…",
     "Abandoned as an aircraft, I still sit upright as a stationary weather station—forever remembered as the Wright Brothers' moment of off-world aviation.",
     {
-      text: "Ось мої фото зараз",
+      text: "It`s me",
       photos: [
         "assets/photos/ingenuity1.jpg",
         "assets/photos/ingenuity2.jpg"
@@ -567,7 +567,7 @@ const stories = {
     "NASA caught my last whisper from 12.2 billion kilometers away. Abandoned to the cold dark and coasting silently toward the red star Aldebaran, the hardware left adrift in deep space.",
     "Even in silence, I am never forgotten: I opened the outer solar system to every mission that followed, and my tiny unexplained slowdown—the \"Pioneer Anomaly\"—helped physicists prove how uneven heat radiation from a spacecraft’s own power source gently pushes it through the vacuum.",
     {
-      text: "Ось мої фото зараз",
+      text: "It`s",
       photos: [
         "assets/photos/pioneer1.jpg",
         "assets/photos/pioneer2.jpg"
@@ -859,8 +859,8 @@ function renderSlide() {
 
 
   document.getElementById("next-slide").innerHTML = isLast
-    ? 'Спочатку <span aria-hidden="true">↺</span>'
-    : 'Далі <span aria-hidden="true">→</span>';
+    ? 'Restart <span aria-hidden="true">↺</span>'
+    : 'Next <span aria-hidden="true">→</span>';
 
     
 }
