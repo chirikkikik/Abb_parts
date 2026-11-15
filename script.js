@@ -1,5 +1,53 @@
 import { createModelScene } from "./scene3d.js";
 
+const worldScenes = new Map();
+
+
+async function renderWorldModels() {
+  const containers = document.querySelectorAll(".planet-model");
+
+  for (const container of containers) {
+    // Не завантажуємо модель повторно
+    if (worldScenes.has(container)) continue;
+
+    const modelPath = container.dataset.modelPath;
+
+    try {
+      const scene = await createModelScene({
+        container,
+
+        models: [
+          {
+            id: modelPath,
+            title: "Planet",
+            path: modelPath,
+
+            position: {
+              x: 0,
+              y: 0,
+              z: 0
+            },
+
+            // Масштаб автоматично підлаштовується
+            // у createModelScene()
+          }
+        ],
+
+        background: 0x000000
+      });
+
+      worldScenes.set(container, scene);
+
+    } catch (error) {
+      console.error(
+        `Не вдалося завантажити планету ${modelPath}:`,
+        error
+      );
+    }
+  }
+}
+
+
 const worlds = {
   moon: {
     title: "Місяць",
@@ -47,7 +95,8 @@ const worlds = {
         mission: "Mars 2020",
         year: "2020",
         description: "Досліджує геологію Марса та збирає зразки порід для майбутнього повернення на Землю.",
-        image: "assets/rover-mars-2.svg"
+        image: "assets/rover-mars-2.svg",
+        model: "/assets/models/rovers/insight.glb"
       },
       {
         id: "ingenuity",
@@ -70,6 +119,7 @@ const wanderers = [
     role: "Самотній мандрівник",
     description: "Залишився далеко від своєї експедиції.",
     image: "assets/rover-mars.svg",
+    model: "/assets/models/rovers/voyager.glb",
     world: "mars",
     location: "МАРС · ВІДДАЛЕНА ДІЛЯНКА"
   },
@@ -473,6 +523,8 @@ document.querySelectorAll("[data-world]").forEach(button => {
     showScreen(characterScreen);
   });
 });
+
+renderWorldModels();
 
 /* =========================
    ВІДОБРАЖЕННЯ ПЕРСОНАЖІВ

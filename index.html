@@ -18,20 +18,55 @@
         <p class="eyebrow">Storytelling about NASA's Discarded Equipment on the Moon and Mars</p>
         <h1>Abandoned but not Forgotten</h1>
       </div>
+      
       <div class="world-picker">
-        <button class="world-card world-card--moon" data-world="moon" aria-label="Обрати Місяць">
-          <img src="assets/moon.svg" alt="" class="world-image">
+
+        <!-- Місяць -->
+        <button
+          class="world-card world-card--moon"
+          data-world="moon"
+          aria-label="Обрати Місяць"
+        >
+          <div
+            class="planet-model"
+            data-model-path="/assets/models/planets/moon.glb"
+          ></div>
+
           <span class="world-name">Місяць</span>
-          <span class="world-subtitle">Тиша на відстані 384 400 км</span>
-          <span class="world-action">Дослідити <span aria-hidden="true">↗</span></span>
+          <span class="world-subtitle">
+            Тиша на відстані 384 400 км
+          </span>
+          <span class="world-action">
+            Дослідити <span aria-hidden="true">↗</span>
+          </span>
         </button>
-        <button class="world-card world-card--mars" data-world="mars" aria-label="Обрати Марс">
-          <img src="assets/mars.svg" alt="" class="world-image">
+
+        <!-- Марс -->
+        <button
+          class="world-card world-card--mars"
+          data-world="mars"
+          aria-label="Обрати Марс"
+        >
+          <div
+            class="planet-model"
+            data-model-path="/assets/models/planets/mars.glb"
+          ></div>
+
           <span class="world-name">Марс</span>
-          <span class="world-subtitle">Червона пустеля без краю</span>
-          <span class="world-action">Дослідити <span aria-hidden="true">↗</span></span>
+          <span class="world-subtitle">
+            Червона пустеля без краю
+          </span>
+          <span class="world-action">
+            Дослідити <span aria-hidden="true">↗</span>
+          </span>
         </button>
+
       </div>
+
+      <div class="planet-viewers">
+
+
+</div>
       <div class="wanderers" id="wanderers">
   <!-- JavaScript автоматично розмістить тут персонажів -->
       </div>

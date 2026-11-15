@@ -127,7 +127,7 @@ function fitCameraToModel(model, fill = 0.75) {
       model.position.z -= center.z * scale;
       model.position.y -= box.min.y * scale;
 
-      model.rotation.y = item.rotation ?? 0;
+      model.rotation.y = item.rotation ?? Math.PI / 4;;
 
       model.traverse((child) => {
         if (child.isMesh) {
