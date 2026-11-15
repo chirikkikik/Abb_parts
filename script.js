@@ -94,8 +94,7 @@ async function renderHorizonPlanet(containerId, worldKey, existingScene) {
 
 const worlds = {
   moon: {
-    title: "Місяць",
-    location: "МІСЯЦЬ · МОРЕ СПОКОЮ",
+    title: "Moon",
     background: "assets/moon.svg",
     characters: [
       {
@@ -103,7 +102,6 @@ const worlds = {
         name: "Apollo 11",
         mission: "Lunokhod-1",
         year: "1970",
-        description: "Перший успішний місяцехід. Досліджував поверхню Місяця та передавав панорамні знімки.",
         image: "assets/rover-moon.svg",
         model: "/assets/models/rovers/apollo11.glb"
       },
@@ -112,7 +110,6 @@ const worlds = {
         name: "Apollo 15",
         mission: "Apollo 15",
         year: "1971",
-        description: "Місячний автомобіль, який допомагав астронавтам досліджувати віддалені ділянки поверхні.",
         image: "assets/rover-moon-2.svg",
         model: "/assets/models/rovers/apollo15.glb"
       }
@@ -120,13 +117,13 @@ const worlds = {
   },
 
   mars: {
-    title: "Марс",
-    location: "МАРС · КРАТЕР ЄЗЕРО",
+    title: "Mars",
+
     background: "assets/mars.svg",
     characters: [
       {
         id: "spirit",
-        name: "Spirit",
+        name: "Opportunity",
         mission: "Mars Science Laboratory",
         year: "2011",
         description: "Досліджує марсіанські породи та шукає свідчення того, що колись на Марсі існувало життя.",
@@ -135,7 +132,7 @@ const worlds = {
       },
       {
         id: "insight",
-        name: "inSight",
+        name: "InSight",
         mission: "Mars 2020",
         year: "2020",
         description: "Досліджує геологію Марса та збирає зразки порід для майбутнього повернення на Землю.",
@@ -159,17 +156,17 @@ const worlds = {
 const wanderers = [
   {
     id: "voyager",
-    name: "Voyager",
+    name: "Voyager1",
     role: "Самотній мандрівник",
     description: "Залишився далеко від своєї експедиції.",
     image: "assets/rover-mars.svg",
     model: "/assets/models/rovers/voyager.glb",
     world: "mars",
-    location: "МАРС · ВІДДАЛЕНА ДІЛЯНКА"
+    location: ""
   },
   {
     id: "pioneer",
-    name: "Pioneer",
+    name: "Pioneer10",
     role: "Дослідник сигналів",
     position: {
       x: 0,
@@ -179,7 +176,7 @@ const wanderers = [
     description: "Намагається відновити зв'язок із Землею.",
     image: "assets/rover-moon-2.svg",
     world: "moon",
-    location: "МІСЯЦЬ · НЕВІДОМИЙ СЕКТОР",
+    location: "Deep space",
     model: "/assets/models/rovers/pioneer.glb"
   }
 ];
@@ -337,7 +334,7 @@ async function renderWandererModels() {
         background: 0x000000
       });
 
-      characterScenes.set(container, scene);
+      wandererScenes.set(container, scene);
 
     } catch (error) {
       console.error(
@@ -661,7 +658,7 @@ async function renderCharacters() {
   );
 
   document.getElementById("character-eyebrow").textContent =
-    `МІСЦЕ ПРИЗНАЧЕННЯ · ${world.title.toUpperCase()}`;
+    ` ${world.title.toUpperCase()}`;
 
   characterGrid.innerHTML = world.characters.map((character, index) => `
     <button
@@ -693,13 +690,12 @@ async function renderCharacters() {
         <h3>${character.name}</h3>
 
         <span class="character-year">
-          РІК МІСІЇ · ${character.year}
+          Year · ${character.year}
         </span>
 
-        <p>${character.description}</p>
 
         <span class="choose">
-          ПЕРЕГЛЯНУТИ ІСТОРІЮ ↗
+          View story ↗
         </span>
 
       </div>
@@ -861,25 +857,12 @@ function renderSlide() {
   document.getElementById("progress-label").textContent =
     `${String(currentSlide + 1).padStart(2, "0")} / ${String(story.length).padStart(2, "0")}`;
 
-  document.getElementById("chapter-label").textContent =
-    `РОЗДІЛ ${String(currentSlide + 1).padStart(2, "0")}`;
 
   document.getElementById("next-slide").innerHTML = isLast
     ? 'Спочатку <span aria-hidden="true">↺</span>'
     : 'Далі <span aria-hidden="true">→</span>';
 
-  const sprite = document.getElementById("character-sprite");
-  const modelContainer = document.getElementById("character-model");
-
-  if (selectedCharacter?.model) {
-    modelContainer.classList.remove("character-model--animate");
-    void modelContainer.offsetWidth;
-    modelContainer.classList.add("character-model--animate");
-  } else {
-    sprite.style.animation = "none";
-    void sprite.offsetWidth;
-    sprite.style.animation = "appear .7s ease both";
-  }
+    
 }
 
 /* =========================

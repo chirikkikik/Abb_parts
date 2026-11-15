@@ -32,12 +32,12 @@
             data-model-path="/assets/models/planets/moon.glb"
           ></div>
 
-          <span class="world-name">Місяць</span>
+          <span class="world-name">Moon</span>
           <span class="world-subtitle">
-            Тиша на відстані 384 400 км
+            Silence at a distance of 384,400 km
           </span>
           <span class="world-action">
-            Дослідити <span aria-hidden="true">↗</span>
+            Explore <span aria-hidden="true">↗</span>
           </span>
         </button>
 
@@ -52,9 +52,9 @@
             data-model-path="/assets/models/planets/mars.glb"
           ></div>
 
-          <span class="world-name">Марс</span>
+          <span class="world-name">Mars</span>
           <span class="world-subtitle">
-            Червона пустеля без краю
+            Endless red desert
           </span>
           <span class="world-action">
             Дослідити <span aria-hidden="true">↗</span>
@@ -79,20 +79,19 @@
     <button class="back-button" id="back-home">
       ← <span>To the deep space</span>
     </button>
-    <span class="topbar-mark">SAMOTNI SIGNALY</span>
+    <span class="topbar-mark"></span>
   </header>
 
   <div class="section-heading">
-    <p class="eyebrow" id="character-eyebrow">МІСЦЕ ПРИЗНАЧЕННЯ</p>
-    <h2>Хто розповість<br><span>цю історію?</span></h2>
-    <p>Обери ровера, щоб почути його спогади.</p>
+    <p class="eyebrow" id="character-eyebrow"></p>
+    <h2>Choose your<br><span>character</span></h2>
   </div>
 
   <div class="character-grid" id="character-grid"></div>
 
   <div class="home-footer">
     <span>02 / 03</span>
-    <span>ОБЕРИ СВОГО ОПОВІДАЧА</span>
+    
   </div>
 </section>
 
@@ -101,14 +100,14 @@
       <div class="story-background" id="story-background"></div>
       <div class="planet-horizon-bg planet-horizon-bg--story" id="story-planet-bg"></div>
       <header class="story-topbar">
-        <button class="back-button" id="back-characters">← <span>Змінити ровера</span></button>
-        <span class="chapter-label" id="chapter-label">РОЗДІЛ 01</span>
+        <button class="back-button" id="back-characters">← <span> Change character</span></button>
+        <!-- /*<span class="chapter-label" id="chapter-label">Chapter 01</span>*/ -->
         <button class="restart-button" id="restart-story" title="Почати спочатку">↺</button>
       </header>
       <div class="story-scene">
         <div class="scene-meta">
           <span class="live-dot"></span>
-          <span id="scene-location">МІСЯЦЬ · МОРЕ СПОКОЮ</span>
+          <span id="scene-location">Moon</span>
         </div>
         <div class="character-stage">
           <img id="character-sprite" src="assets/rover-moon.svg" alt="Ровер">
@@ -117,17 +116,17 @@
         <div class="dialogue-panel">
           <div class="speaker-row">
             <span class="speaker-name" id="speaker-name">Ровер</span>
-            <span class="speaker-tag">ОСОБИСТИЙ ЖУРНАЛ</span>
+            <span class="speaker-tag">Personal journal</span>
           </div>
           <p class="dialogue-text" id="dialogue-text" aria-live="polite"></p>
           <div class="story-gallery" id="story-gallery"></div>
           <div class="dialogue-bottom">
             <span class="progress-label" id="progress-label">01 / 05</span>
-            <button class="next-button" id="next-slide">Далі <span aria-hidden="true">→</span></button>
+            <button class="next-button" id="next-slide">Next <span aria-hidden="true">→</span></button>
           </div>
         </div>
       </div>
-      <div class="story-footer"><span>ЗАПИСИ З ПОВЕРХНІ</span><span>ЗВ'ЯЗОК НЕ ЗАВЖДИ ОЗНАЧАЄ ВІДПОВІДЬ</span></div>
+
     </section>
   <!-- Повноекранний перегляд фото -->
     <div class="photo-lightbox" id="photo-lightbox" aria-hidden="true">
