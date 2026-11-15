@@ -203,10 +203,13 @@ async function renderCharacterModels() {
   characterScenes.forEach(scene => scene.dispose());
   characterScenes.clear();
 
-  const containers = document.querySelectorAll(".character-model");
+  const containers = document.querySelectorAll(
+    ".character-card .character-model[data-model-path]"
+  );
 
   for (const container of containers) {
     const modelPath = container.dataset.modelPath;
+    if (!modelPath) continue;
 
     try {
       const scene = await createModelScene({
@@ -612,6 +615,69 @@ let selectedCharacter = null;
 let currentSlide = 0;
 let storyEntryPoint = "planet";
 
+let currentAudio = null;
+
+const audioButton = document.getElementById("audio-toggle");
+
+function stopStoryAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  audioButton.textContent = "▶ Озвучити";
+  audioButton.disabled = false;
+}
+
+function setupStoryAudio() {
+  stopStoryAudio();
+
+  const story = getCurrentStory();
+  const slide = story[currentSlide];
+
+  // Фінальний слайд із фотографіями не має озвучки
+  if (typeof slide !== "string") {
+    audioButton.style.display = "none";
+    return;
+  }
+
+  audioButton.style.display = "";
+  audioButton.disabled = false;
+
+  const characterId = selectedCharacter.id;
+  const audioPath = `/assets/audio/${characterId}/${currentSlide + 1}.mp3`;
+
+  currentAudio = new Audio(audioPath);
+
+  currentAudio.addEventListener("ended", () => {
+    audioButton.textContent = "▶ Play audio";
+  });
+
+  currentAudio.addEventListener("error", () => {
+    audioButton.textContent = "▶ Play audio";
+    console.error("Не вдалося завантажити аудіо:", audioPath);
+  });
+
+  audioButton.disabled = false;
+  audioButton.textContent = "▶ Play audio";
+}
+
+audioButton.addEventListener("click", async () => {
+  if (!currentAudio) return;
+
+  if (currentAudio.paused) {
+    try {
+      await currentAudio.play();
+      audioButton.textContent = "⏸ Stop";
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  } else {
+    currentAudio.pause();
+    audioButton.textContent = "▶ Continue";
+  }
+});
 /* =========================
    ПЕРЕМИКАННЯ ЕКРАНІВ
 ========================= */
@@ -827,6 +893,7 @@ async function startStory(characterId) {
 function renderSlide() {
   const story = getCurrentStory();
   const slide = story[currentSlide];
+  setupStoryAudio();
   const isLast = currentSlide === story.length - 1;
 
   const slideText = typeof slide === "string" ? slide : slide.text;
@@ -862,8 +929,9 @@ function renderSlide() {
     ? 'Restart <span aria-hidden="true">↺</span>'
     : 'Next <span aria-hidden="true">→</span>';
 
-    
 }
+
+
 
 /* =========================
    КНОПКИ НАВІГАЦІЇ
@@ -881,6 +949,7 @@ document.getElementById("next-slide").addEventListener("click", () => {
 renderWanderers();
 
 document.getElementById("back-home").addEventListener("click", () => {
+  stopStoryAudio();
   if (storyCharacterScene) {
     storyCharacterScene.dispose();
     storyCharacterScene = null;
@@ -898,6 +967,7 @@ document.getElementById("back-home").addEventListener("click", () => {
 });
 
 document.getElementById("back-characters").addEventListener("click", () => {
+  stopStoryAudio();
   // Очищаємо тільки модель з екрана історії
   if (storyCharacterScene) {
     storyCharacterScene.dispose();
